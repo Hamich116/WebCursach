@@ -1,0 +1,82 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Управление пользователями</h2>
+    <a href="/users/create" class="btn btn-primary">Создать пользователя</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя пользователя</th>
+                <th>Полное имя</th>
+                <th>Email</th>
+                <th>Роль</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(function(user) { %>
+                <tr>
+                    <td><%= user.id %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.full_name %></td>
+                    <td><%= user.email %></td>
+                    <td>
+                        <% const role = roles.find(function(r) { return r.id === user.role_id; }); %>
+                        <%= role ? role.name : 'Неизвестно' %>
+                    </td>
+                    <td>
+                        <span class="badge bg-<%= user.is_active ? 'success' : 'danger' %>">
+                            <%= user.is_active ? 'Активен' : 'Отключен' %>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="/users/<%= user.id %>/edit" class="btn btn-sm btn-warning">
+                                Изменить
+                            </a>
+                            <% if (typeof currentUser !== 'undefined' && user.id !== currentUser.id) { %>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="deleteUser('<%= user.id %>')">
+                                    Удалить
+                                </button>
+                            <% } %>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<% if (users.length === 0) { %>
+    <div class="alert alert-info">
+        Пользователей пока нет
+    </div>
+<% } %>
+
+<script>
+function deleteUser(id) {
+    if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+        fetch('/users/' + id, { 
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.message || 'Ошибка при удалении пользователя');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при удалении пользователя');
+        });
+    }
+}
+</script> 

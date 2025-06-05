@@ -1,0 +1,101 @@
+/* Global styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar customization */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Card customization */
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,.1);
+}
+
+/* Form customization */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+/* Table customization */
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+/* Button customization */
+.btn {
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Alert customization */
+.alert {
+    border: none;
+    border-radius: 4px;
+}
+
+/* Custom spacing */
+.mt-6 {
+    margin-top: 4rem;
+}
+
+.mb-6 {
+    margin-bottom: 4rem;
+}
+
+/* Custom text styles */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* File input customization */
+.custom-file-input:lang(en)~.custom-file-label::after {
+    content: "Выбрать";
+}
+
+/* Badge customization */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+/* List group customization */
+.list-group-item {
+    border: 1px solid rgba(0,0,0,.125);
+}
+
+/* Utility classes */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.text-truncate {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+} 

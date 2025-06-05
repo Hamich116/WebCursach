@@ -1,0 +1,122 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Просмотр письма</h4>
+        <div>
+            <% if (currentUser.role_id === 1 || (currentUser.role_id === 2 && letter.registrar_id === currentUser.id)) { %>
+                <a href="/letters/<%= letter.id %>/edit" class="btn btn-primary">Редактировать</a>
+            <% } %>
+            <a href="/letters" class="btn btn-secondary">Назад</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Информация о регистрации</h5>
+                <table class="table">
+                    <tr>
+                        <th>Входящий номер:</th>
+                        <td><%= letter.incoming_number %></td>
+                    </tr>
+                    <tr>
+                        <th>Дата регистрации:</th>
+                        <td><%= new Date(letter.registration_date).toLocaleDateString('ru-RU') %></td>
+                    </tr>
+                    <tr>
+                        <th>Зарегистрировал:</th>
+                        <td><%= letter.registrar_name %></td>
+                    </tr>
+                    <tr>
+                        <th>Статус:</th>
+                        <td><%= letter.status %></td>
+                    </tr>
+                </table>
+
+                <h5 class="mt-4">Информация об отправителе</h5>
+                <table class="table">
+                    <tr>
+                        <th>Отправитель:</th>
+                        <td><%= letter.sender_name %></td>
+                    </tr>
+                    <tr>
+                        <th>Адрес:</th>
+                        <td><%= letter.sender_address || '-' %></td>
+                    </tr>
+                    <tr>
+                        <th>Контакты:</th>
+                        <td><%= letter.sender_contact || '-' %></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <h5>Информация о письме</h5>
+                <table class="table">
+                    <tr>
+                        <th>Тема:</th>
+                        <td><%= letter.subject %></td>
+                    </tr>
+                    <tr>
+                        <th>Дата письма:</th>
+                        <td><%= new Date(letter.letter_date).toLocaleDateString('ru-RU') %></td>
+                    </tr>
+                    <tr>
+                        <th>Дата получения:</th>
+                        <td><%= new Date(letter.received_date).toLocaleDateString('ru-RU') %></td>
+                    </tr>
+                    <tr>
+                        <th>Срок исполнения:</th>
+                        <td><%= letter.deadline ? new Date(letter.deadline).toLocaleDateString('ru-RU') : '-' %></td>
+                    </tr>
+                    <tr>
+                        <th>Исполнитель:</th>
+                        <td>
+                            <% if (letter.executor_id && letter.executor_name) { %>
+                                <%= letter.executor_name %>
+                            <% } else { %>
+                                <span class="text-muted">Не назначен</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                </table>
+
+                <% if (letter.description) { %>
+                    <h5 class="mt-4">Описание</h5>
+                    <p><%= letter.description %></p>
+                <% } %>
+            </div>
+        </div>
+
+        <% if (attachments && attachments.length > 0) { %>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h5>Вложения</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Имя файла</th>
+                                <th>Размер</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% attachments.forEach(function(attachment) { %>
+                                <tr>
+                                    <td><%= attachment.file_name %></td>
+                                    <td><%= Math.round(attachment.file_size / 1024) %> KB</td>
+                                    <td>
+                                        <a href="/letters/attachments/<%= attachment.id %>/download" class="btn btn-sm btn-primary">Скачать</a>
+                                        <% if (currentUser.role_id === 1 || (currentUser.role_id === 2 && letter.registrar_id === currentUser.id)) { %>
+                                            <form action="/letters/attachments/<%= attachment.id %>/delete" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены?')">Удалить</button>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div> 

@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Назначенные мне письма</h2>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Дата регистрации</th>
+                <th>Отправитель</th>
+                <th>Тема</th>
+                <th>Статус</th>
+                <th>Срок</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% letters.forEach(letter => { %>
+                <tr>
+                    <td><%- letter.incoming_number %></td>
+                    <td><%- new Date(letter.registration_date).toLocaleDateString() %></td>
+                    <td><%- letter.sender_name %></td>
+                    <td><%- letter.subject %></td>
+                    <td>
+                        <span class="badge bg-<%= {
+                            'В работе': 'primary',
+                            'На контроле': 'warning',
+                            'Исполнено': 'success'
+                        }[letter.status] %>">
+                            <%- letter.status %>
+                        </span>
+                    </td>
+                    <td>
+                        <% if (letter.deadline) { %>
+                            <% const deadline = new Date(letter.deadline);
+                               const today = new Date();
+                               const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                               const badgeClass = diffDays < 0 ? 'bg-danger' :
+                                                diffDays <= 3 ? 'bg-warning' :
+                                                'bg-info';
+                            %>
+                            <span class="badge <%- badgeClass %>">
+                                <%- deadline.toLocaleDateString() %>
+                            </span>
+                        <% } else { %>
+                            -
+                        <% } %>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="/letters/<%- letter.id %>" class="btn btn-sm btn-info">
+                                Просмотр
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<% if (letters.length === 0) { %>
+    <div class="alert alert-info">
+        У вас нет назначенных писем
+    </div>
+<% } %> 

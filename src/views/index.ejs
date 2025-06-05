@@ -1,0 +1,35 @@
+<div class="container">
+    <% if (!currentUser) { %>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4">Система регистрации входящих писем</h1>
+                <p class="lead mt-4">
+                    Добро пожаловать в систему регистрации и контроля исполнения входящих писем.
+                </p>
+                <div class="mt-5">
+                    <a href="/auth/login" class="btn btn-primary btn-lg">Войти в систему</a>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4">Добро пожаловать, <%= currentUser.full_name %>!</h1>
+                <p class="lead mt-4">
+                    Выберите нужный раздел в меню навигации.
+                </p>
+                <div class="mt-5">
+                    <% if (currentUser.role_id === 1) { %>
+                        <a href="/users" class="btn btn-primary btn-lg me-3">Управление пользователями</a>
+                    <% } %>
+                    <% if (currentUser.role_id === 1 || currentUser.role_id === 2) { %>
+                        <a href="/letters" class="btn btn-primary btn-lg me-3">Управление письмами</a>
+                    <% } %>
+                    <% if (currentUser.role_id === 3) { %>
+                        <a href="/letters/assigned" class="btn btn-primary btn-lg me-3">Мои письма</a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div> 

@@ -1,0 +1,98 @@
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">Регистрация нового письма</h4>
+    </div>
+    <div class="card-body">
+        <form action="/letters" method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Информация об отправителе</h5>
+                    <div class="mb-3">
+                        <label for="sender_name" class="form-label">Отправитель *</label>
+                        <input type="text" class="form-control" id="sender_name" name="sender_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sender_address" class="form-label">Адрес отправителя</label>
+                        <input type="text" class="form-control" id="sender_address" name="sender_address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sender_contact" class="form-label">Контактные данные</label>
+                        <input type="text" class="form-control" id="sender_contact" name="sender_contact">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Информация о письме</h5>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Тема письма *</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="letter_date" class="form-label">Дата письма *</label>
+                        <input type="date" class="form-control" id="letter_date" name="letter_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="received_date" class="form-label">Дата получения *</label>
+                        <input type="date" class="form-control" id="received_date" name="received_date" 
+                               value="<%= new Date().toISOString().split('T')[0] %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deadline" class="form-label">Срок исполнения</label>
+                        <input type="date" class="form-control" id="deadline" name="deadline">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h5>Дополнительная информация</h5>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="executor_id" class="form-label">Исполнитель</label>
+                        <select class="form-select" id="executor_id" name="executor_id">
+                            <option value="">Выберите исполнителя</option>
+                            <% if (typeof executors !== 'undefined') { %>
+                                <% executors.forEach(function(executor) { %>
+                                    <option value="<%= executor.id %>"><%= executor.full_name %></option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="attachments" class="form-label">Вложения</label>
+                        <input type="file" class="form-control" id="attachments" name="attachments" multiple>
+                        <div class="form-text">Можно прикрепить до 5 файлов. Допустимые форматы: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Зарегистрировать письмо</button>
+                <a href="/letters" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Автоматическое заполнение даты получения
+    const receivedDateInput = document.getElementById('received_date');
+    if (!receivedDateInput.value) {
+        receivedDateInput.valueAsDate = new Date();
+    }
+
+    // Валидация даты исполнения
+    const deadlineInput = document.getElementById('deadline');
+    deadlineInput.addEventListener('change', function() {
+        const selectedDate = new Date(this.value);
+        const today = new Date();
+        if (selectedDate < today) {
+            alert('Срок исполнения не может быть раньше текущей даты');
+            this.value = '';
+        }
+    });
+});
+</script> 

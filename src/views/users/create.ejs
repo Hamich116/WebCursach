@@ -1,0 +1,56 @@
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">Создание нового пользователя</h4>
+    </div>
+    <div class="card-body">
+        <form action="/users" method="POST">
+            <div class="mb-3">
+                <label for="username" class="form-label">Имя пользователя *</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Пароль *</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="full_name" class="form-label">ФИО *</label>
+                <input type="text" class="form-control" id="full_name" name="full_name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="role_id" class="form-label">Роль *</label>
+                <select class="form-select" id="role_id" name="role_id" required>
+                    <option value="">Выберите роль</option>
+                    <% roles.forEach(function(role) { %>
+                        <option value="<%= role.id %>"><%= role.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <div class="mt-4">
+                <a href="/users" class="btn btn-secondary">Отмена</a>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('Пароль должен содержать не менее 6 символов');
+        }
+    });
+});
+</script> 
