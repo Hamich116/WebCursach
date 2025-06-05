@@ -11,75 +11,9 @@
 - Управление пользователями системы
 - Поиск и фильтрация писем
 
-## Требования
-
-- Node.js 14.x или выше
-- MySQL 5.7 или выше
-- npm или yarn
-
-## Установка
-
-1. Клонируйте репозиторий:
-```bash
-git clone <url-репозитория>
-cd incoming-mail-system
-```
-
-2. Установите зависимости:
-```bash
-npm install
-```
-
-3. Создайте базу данных и пользователя в MySQL:
-```sql
-CREATE DATABASE incoming_mail_db;
-CREATE USER 'mail_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON incoming_mail_db.* TO 'mail_user'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-4. Создайте файл .env в корневой директории проекта:
-```
-DB_HOST=localhost
-DB_USER=mail_user
-DB_PASSWORD=your_password
-DB_NAME=incoming_mail_db
-PORT=3000
-SESSION_SECRET=your_session_secret
-UPLOAD_PATH=uploads/
-```
-
-5. Создайте директорию для загрузки файлов:
-```bash
-mkdir uploads
-```
-
-6. Запустите миграции базы данных:
-```sql
--- Выполните SQL-скрипт из файла database.sql
-```
-
-## Запуск
-
-Для разработки:
-```bash
-npm run dev
-```
-
-Для production:
-```bash
-npm start
-```
 
 Приложение будет доступно по адресу: http://localhost:3000
 
-## Первый вход
-
-По умолчанию создается администратор системы:
-- Логин: admin
-- Пароль: admin123
-
-После первого входа рекомендуется сменить пароль администратора.
 
 ## Роли пользователей
 
