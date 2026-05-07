@@ -1,0 +1,122 @@
+<div class="container py-4">
+    <% if (!currentUser) { %>
+        <!-- Гостевой экран -->
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4">Система регистрации писем</h1>
+                <p class="lead mt-4 text-muted">
+                    Простое решение для учета, регистрации и контроля исполнения входящих писем.
+                </p>
+                <div class="mt-5">
+                    <a href="/auth/login" class="btn btn-primary btn-lg px-4">Войти в систему</a>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- Панель управления -->
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-8">
+                <h2>Добро пожаловать, <%= currentUser.full_name %>!</h2>
+                <p class="text-muted">
+                    Роль в системе: 
+                    <strong>
+                        <% if (currentUser.role_id === 1) { %>Администратор<% } %>
+                        <% if (currentUser.role_id === 2) { %>Регистратор<% } %>
+                        <% if (currentUser.role_id === 3) { %>Исполнитель<% } %>
+                    </strong>
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <% if (currentUser.role_id === 1 || currentUser.role_id === 2) { %>
+                    <a href="/letters/create" class="btn btn-primary">Новое письмо</a>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Статистика (асинхронно через AJAX) -->
+        <div class="row mb-5" id="stats-dashboard-container">
+            <div class="col-md-3">
+                <div class="card border-primary text-center py-3">
+                    <h3 id="stat-total" class="text-primary">-</h3>
+                    <div class="text-muted small uppercase">Всего писем</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-success text-center py-3">
+                    <h3 id="stat-today" class="text-success">-</h3>
+                    <div class="text-muted small uppercase">Зарегистрировано сегодня</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-warning text-center py-3">
+                    <h3 id="stat-active" class="text-warning">-</h3>
+                    <div class="text-muted small uppercase">Активных в работе</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-danger text-center py-3">
+                    <h3 id="stat-overdue" class="text-danger">-</h3>
+                    <div class="text-muted small uppercase">Просрочено писем</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Быстрые действия -->
+        <div class="card">
+            <div class="card-header">
+                Доступные разделы
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5>Реестр писем</h5>
+                        <p class="text-muted small">Список всей входящей корреспонденции.</p>
+                        <a href="/letters" class="btn btn-sm btn-outline-primary">Перейти</a>
+                    </div>
+                    <% if (currentUser.role_id === 3) { %>
+                        <div class="col-md-4 mb-3">
+                            <h5>Мои задачи</h5>
+                            <p class="text-muted small">Письма, переданные вам на исполнение.</p>
+                            <a href="/letters/assigned" class="btn btn-sm btn-outline-warning">Перейти</a>
+                        </div>
+                    <% } %>
+                    <% if (currentUser.role_id === 1) { %>
+                        <div class="col-md-4 mb-3">
+                            <h5>Пользователи</h5>
+                            <p class="text-muted small">Управление учетными записями.</p>
+                            <a href="/users" class="btn btn-sm btn-outline-success">Перейти</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                $.ajax({
+                    url: '/api/stats',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            const stats = response.stats;
+                            $('#stat-total').text(stats.total);
+                            $('#stat-today').text(stats.today);
+                            $('#stat-overdue').text(stats.overdue);
+                            
+                            let activeCount = 0;
+                            if (stats.byStatus) {
+                                stats.byStatus.forEach(function(item) {
+                                    if (item.status === 'В работе' || item.status === 'На контроле') {
+                                        activeCount += item.count;
+                                    }
+                                });
+                            }
+                            $('#stat-active').text(activeCount);
+                        }
+                    }
+                });
+            });
+        </script>
+    <% } %>
+</div>

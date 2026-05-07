@@ -1,0 +1,108 @@
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-10">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-8">
+                <h1 class="h2 text-dark m-0"><i class="bi bi-envelope-plus-fill text-primary me-2"></i>Регистрация входящего письма</h1>
+                <p class="text-muted m-0">Внесите реквизиты документа в систему для последующего контроля и исполнения</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="/letters" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left me-1"></i> Вернуться к списку</a>
+            </div>
+        </div>
+
+        <div class="card card-premium shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="m-0 text-dark fw-bold"><i class="bi bi-file-earmark-diff me-2"></i>Форма регистрации корреспонденции</h5>
+            </div>
+            <div class="card-body">
+                <form action="/letters" method="POST" enctype="multipart/form-data" class="form-premium">
+                    <div class="row g-4">
+                        <!-- Левая колонка: Отправитель -->
+                        <div class="col-md-6 border-end pe-md-4">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-person-badge text-primary me-2"></i>Реквизиты отправителя</h5>
+                            
+                            <div class="mb-3">
+                                <label for="sender_name" class="form-label">Отправитель (Организация / ФИО) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="sender_name" name="sender_name" placeholder="ООО 'Вектор' или Иванов И.И." required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sender_address" class="form-label">Почтовый адрес</label>
+                                <input type="text" class="form-control" id="sender_address" name="sender_address" placeholder="101000, г. Москва, ул. Ленина, д. 1">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sender_contact" class="form-label">Контактная информация (Email / Телефон)</label>
+                                <input type="text" class="form-control" id="sender_contact" name="sender_contact" placeholder="info@example.com, +7 (495) 123-45-67">
+                            </div>
+                        </div>
+
+                        <!-- Правая колонка: Письмо -->
+                        <div class="col-md-6 ps-md-4">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-file-text text-primary me-2"></i>Параметры документа</h5>
+                            
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Тематика письма (Заголовок) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="subject" name="subject" placeholder="О поставке оборудования по договору №12" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="letter_date" class="form-label">Дата письма (исходящая) <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="letter_date" name="letter_date" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="received_date" class="form-label">Дата получения <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="received_date" name="received_date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="deadline" class="form-label">Срок исполнения</label>
+                                    <input type="date" class="form-control" id="deadline" name="deadline">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="executor_id" class="form-label">Исполнитель</label>
+                                    <select class="form-select" id="executor_id" name="executor_id">
+                                        <option value="">Не назначать</option>
+                                        <% if (typeof executors !== 'undefined' && executors) { %>
+                                            <% executors.forEach(function(executor) { %>
+                                                <option value="<%= executor.id %>"><%= executor.full_name %></option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-paperclip text-primary me-2"></i>Дополнительно и файлы</h5>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Краткое содержание (Аннотация)</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Краткое описание сути обращения, поручений или сопроводительных материалов..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="attachments" class="form-label">Прикрепить файлы вложений</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-cloud-arrow-up text-primary"></i></span>
+                                    <input type="file" class="form-control" id="attachments" name="attachments" multiple>
+                                </div>
+                                <div class="form-text mt-1 text-muted"><i class="bi bi-info-circle me-1"></i>Можно прикрепить до 5 файлов. Форматы: JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX. Лимит размера: 10 МБ.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2.5 shadow-sm fw-bold"><i class="bi bi-check-circle me-1"></i> Зарегистрировать письмо</button>
+                        <a href="/letters" class="btn btn-outline-secondary px-4 py-2.5">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

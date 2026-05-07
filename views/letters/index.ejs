@@ -1,0 +1,180 @@
+<div id="letters-container" data-role-id="<%= currentUser.role_id %>" data-user-id="<%= currentUser.id %>" class="animate-fade-in">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h1 class="h2 text-dark m-0"><i class="bi bi-mailbox2 text-primary me-2"></i>Реестр входящих писем</h1>
+            <p class="text-muted m-0">Учет, распределение и контроль исполнения корреспонденции</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <% if (currentUser.role_id === 1 || currentUser.role_id === 2) { %>
+                <a href="/letters/create" class="btn btn-primary shadow-sm"><i class="bi bi-plus-circle me-1"></i> Регистрация письма</a>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Панель поиска и фильтров -->
+    <div class="search-panel mb-4 animate-fade-in">
+        <form id="letter-search-form" class="row g-3 form-premium">
+            <div class="col-md-4">
+                <label for="search-input" class="form-label">Поиск по тексту</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="search-input" name="search" class="form-control border-start-0 ps-0" placeholder="№, отправитель, тема, описание...">
+                </div>
+            </div>
+            
+            <div class="col-md-2">
+                <label for="status-filter" class="form-label">Статус</label>
+                <select id="status-filter" name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    <option value="Зарегистрировано">Зарегистрировано</option>
+                    <option value="В работе">В работе</option>
+                    <option value="На контроле">На контроле</option>
+                    <option value="Исполнено">Исполнено</option>
+                    <option value="Архивировано">Архивировано</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label for="date-from" class="form-label">Регистрация с</label>
+                <input type="date" id="date-from" name="date_from" class="form-control">
+            </div>
+            
+            <div class="col-md-2">
+                <label for="date-to" class="form-label">Регистрация по</label>
+                <input type="date" id="date-to" name="date_to" class="form-control">
+            </div>
+            
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> Найти</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Таблица писем -->
+    <div class="card card-premium shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="m-0 text-dark fw-bold"><i class="bi bi-table me-2"></i>Список зарегистрированных писем</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-premium m-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%">Входящий №</th>
+                            <th style="width: 15%">Дата рег.</th>
+                            <th style="width: 25%">Отправитель / Тема</th>
+                            <th style="width: 12%">Дата письма</th>
+                            <th style="width: 15%">Исполнитель</th>
+                            <th style="width: 11%">Статус</th>
+                            <th style="width: 10%">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="letters-table-body">
+                        <% if (letters && letters.length > 0) { %>
+                            <% letters.forEach(function(letter) { %>
+                                <tr class="animate-fade-in">
+                                    <td class="fw-bold text-primary"><%= letter.incoming_number %></td>
+                                    <td><%= new Date(letter.registration_date).toLocaleDateString('ru-RU') %></td>
+                                    <td>
+                                        <div class="fw-bold text-dark"><%= letter.sender_name %></div>
+                                        <div class="text-muted small text-truncate" style="max-width: 250px;"><%= letter.subject %></div>
+                                    </td>
+                                    <td><%= letter.letter_date ? new Date(letter.letter_date).toLocaleDateString('ru-RU') : '-' %></td>
+                                    <td>
+                                        <% if (letter.executor_name) { %>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-person me-1 text-muted"></i>
+                                                <span><%= letter.executor_name %></span>
+                                            </div>
+                                        <% } else { %>
+                                            <span class="text-muted small">Не назначен</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% 
+                                            let statusBadgeClass = 'badge-registered';
+                                            let statusIcon = 'bi-bookmark-plus';
+                                            if (letter.status === 'В работе') { statusBadgeClass = 'badge-in-progress'; statusIcon = 'bi-clock'; }
+                                            else if (letter.status === 'На контроле') { statusBadgeClass = 'badge-on-control'; statusIcon = 'bi-exclamation-circle'; }
+                                            else if (letter.status === 'Исполнено') { statusBadgeClass = 'badge-executed'; statusIcon = 'bi-check-lg'; }
+                                            else if (letter.status === 'Архивировано') { statusBadgeClass = 'badge-archived'; statusIcon = 'bi-archive'; }
+                                        %>
+                                        <span class="badge badge-status <%= statusBadgeClass %>">
+                                            <i class="bi <%= statusIcon %>"></i> <%= letter.status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <a href="/letters/<%= letter.id %>" class="btn btn-sm btn-info text-white">
+                                                Открыть
+                                            </a>
+                                            <% if (currentUser.role_id === 1 || (currentUser.role_id === 2 && letter.registrar_id === currentUser.id)) { %>
+                                                <a href="/letters/<%= letter.id %>/edit" class="btn btn-sm btn-primary">
+                                                    Редактировать
+                                                </a>
+                                            <% } %>
+                                            <% if (currentUser.role_id === 1) { %>
+                                                <button class="btn btn-sm btn-danger btn-delete-letter" data-id="<%= letter.id %>" data-number="<%= letter.incoming_number %>">
+                                                    Удалить
+                                                </button>
+                                            <% } %>
+                                            <% if (currentUser.role_id === 3 && letter.executor_id === currentUser.id && (letter.status === 'В работе' || letter.status === 'На контроле')) { %>
+                                                <button class="btn btn-sm btn-success btn-update-status-modal" data-id="<%= letter.id %>" data-number="<%= letter.incoming_number %>" data-status="<%= letter.status %>" data-result="<%= letter.result || '' %>">
+                                                    Отчитаться
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    Писем пока нет
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно обновления статуса исполнителем -->
+<div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: var(--radius-md);">
+            <div class="modal-header bg-light border-0 py-3">
+                <h5 class="modal-title fw-bold text-dark" id="statusUpdateModalLabel">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>Исполнение письма №<span id="modal-letter-number"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" data-bs-target="#statusUpdateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="status-update-form" class="form-premium">
+                <div class="modal-body px-4 py-3">
+                    <input type="hidden" id="modal-letter-id">
+                    
+                    <div class="mb-3">
+                        <label for="modal-status" class="form-label">Установить статус</label>
+                        <select id="modal-status" class="form-select" required>
+                            <option value="В работе">В работе</option>
+                            <option value="На контроле">На контроле</option>
+                            <option value="Исполнено">Исполнено</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-2" id="result-field-group" style="display: none;">
+                        <label for="modal-result" class="form-label">Результат исполнения</label>
+                        <textarea id="modal-result" class="form-control" rows="4" placeholder="Опишите результаты выполнения, реквизиты ответного письма или другие детали..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-success shadow-sm fw-bold"><i class="bi bi-check-lg"></i> Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

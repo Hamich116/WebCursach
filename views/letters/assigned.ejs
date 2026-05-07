@@ -1,0 +1,127 @@
+<div id="letters-container" data-role-id="<%= currentUser.role_id %>" data-user-id="<%= currentUser.id %>" class="animate-fade-in">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-12">
+            <h1 class="h2 text-dark m-0"><i class="bi bi-clock-history text-warning me-2"></i>Мои задачи (назначенные письма)</h1>
+            <p class="text-muted m-0">Письма, переданные вам на исполнение, требующие вашего внимания</p>
+        </div>
+    </div>
+
+    <!-- Таблица назначенных писем -->
+    <div class="card card-premium shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="m-0 text-dark fw-bold"><i class="bi bi-list-task me-2"></i>Список активных задач</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-premium m-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%">Входящий №</th>
+                            <th style="width: 15%">Дата рег.</th>
+                            <th style="width: 30%">Отправитель / Тема</th>
+                            <th style="width: 15%">Статус</th>
+                            <th style="width: 15%">Срок исполнения</th>
+                            <th style="width: 10%">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (letters && letters.length > 0) { %>
+                            <% letters.forEach(function(letter) { %>
+                                <tr class="animate-fade-in">
+                                    <td class="fw-bold text-primary"><%= letter.incoming_number %></td>
+                                    <td><%= new Date(letter.registration_date).toLocaleDateString('ru-RU') %></td>
+                                    <td>
+                                        <div class="fw-bold text-dark"><%= letter.sender_name %></div>
+                                        <div class="text-muted small text-truncate" style="max-width: 300px;"><%= letter.subject %></div>
+                                    </td>
+                                    <td>
+                                        <% 
+                                            let statusBadgeClass = 'badge-in-progress';
+                                            let statusIcon = 'bi-clock';
+                                            if (letter.status === 'На контроле') { statusBadgeClass = 'badge-on-control'; statusIcon = 'bi-exclamation-circle'; }
+                                            else if (letter.status === 'Исполнено') { statusBadgeClass = 'badge-executed'; statusIcon = 'bi-check-lg'; }
+                                        %>
+                                        <span class="badge badge-status <%= statusBadgeClass %>">
+                                            <i class="bi <%= statusIcon %>"></i> <%= letter.status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <% if (letter.deadline) { %>
+                                            <% 
+                                                const deadline = new Date(letter.deadline);
+                                                const today = new Date();
+                                                const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                                                const badgeClass = diffDays < 0 ? 'bg-danger text-white' :
+                                                                 diffDays <= 3 ? 'bg-warning text-dark' :
+                                                                 'bg-info text-dark';
+                                            %>
+                                            <span class="badge <%= badgeClass %> px-2.5 py-1.5" style="font-size: 0.8rem;">
+                                                <i class="bi bi-calendar-event me-1"></i> <%= deadline.toLocaleDateString('ru-RU') %>
+                                            </span>
+                                        <% } else { %>
+                                            <span class="text-muted">-</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="/letters/<%= letter.id %>" class="btn btn-sm btn-info text-white">
+                                                Открыть
+                                            </a>
+                                            <button class="btn btn-sm btn-success btn-update-status-modal" data-id="<%= letter.id %>" data-number="<%= letter.incoming_number %>" data-status="<%= letter.status %>" data-result="<%= letter.result || '' %>">
+                                                Отчитаться
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-emoji-smile fs-2 d-block mb-2 text-success"></i>
+                                    У вас нет активных назначенных писем!
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно обновления статуса исполнителем -->
+<div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: var(--radius-md);">
+            <div class="modal-header bg-light border-0 py-3">
+                <h5 class="modal-title fw-bold text-dark" id="statusUpdateModalLabel">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>Исполнение письма №<span id="modal-letter-number"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="status-update-form" class="form-premium">
+                <div class="modal-body px-4 py-3">
+                    <input type="hidden" id="modal-letter-id">
+                    
+                    <div class="mb-3">
+                        <label for="modal-status" class="form-label">Установить статус</label>
+                        <select id="modal-status" class="form-select" required>
+                            <option value="В работе">В работе</option>
+                            <option value="На контроле">На контроле</option>
+                            <option value="Исполнено">Исполнено</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-2" id="result-field-group" style="display: none;">
+                        <label for="modal-result" class="form-label">Результат исполнения</label>
+                        <textarea id="modal-result" class="form-control" rows="4" placeholder="Опишите результаты выполнения, реквизиты ответного письма или другие детали..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light px-4 py-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-success shadow-sm fw-bold"><i class="bi bi-check-lg"></i> Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

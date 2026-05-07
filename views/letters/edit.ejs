@@ -1,0 +1,177 @@
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-10">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-8">
+                <h1 class="h2 text-dark m-0"><i class="bi bi-pencil-square text-primary me-2"></i>Редактирование письма №<%= letter.incoming_number %></h1>
+                <p class="text-muted m-0">Измените необходимые реквизиты, назначьте исполнителя или установите статус исполнения</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="/letters/<%= letter.id %>" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left me-1"></i> Отменить и вернуться</a>
+            </div>
+        </div>
+
+        <div class="card card-premium shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="m-0 text-dark fw-bold"><i class="bi bi-file-earmark-diff me-2"></i>Форма изменения реквизитов</h5>
+            </div>
+            <div class="card-body">
+                <form action="/letters/<%= letter.id %>" method="POST" enctype="multipart/form-data" class="form-premium">
+                    <div class="row g-4">
+                        <!-- Левая колонка: Отправитель -->
+                        <div class="col-md-6 border-end pe-md-4">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-person-badge text-primary me-2"></i>Реквизиты отправителя</h5>
+                            
+                            <div class="mb-3">
+                                <label for="sender_name" class="form-label">Отправитель (Организация / ФИО) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="sender_name" name="sender_name" value="<%= letter.sender_name %>" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sender_address" class="form-label">Почтовый адрес</label>
+                                <input type="text" class="form-control" id="sender_address" name="sender_address" value="<%= letter.sender_address %>" placeholder="101000, г. Москва...">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sender_contact" class="form-label">Контактная информация</label>
+                                <input type="text" class="form-control" id="sender_contact" name="sender_contact" value="<%= letter.sender_contact %>" placeholder="Телефон или email...">
+                            </div>
+                        </div>
+
+                        <!-- Правая колонка: Письмо -->
+                        <div class="col-md-6 ps-md-4">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-file-text text-primary me-2"></i>Параметры документа</h5>
+                            
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Тематика письма (Заголовок) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="subject" name="subject" value="<%= letter.subject %>" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="letter_date" class="form-label">Дата письма <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="letter_date" name="letter_date" value="<%= new Date(letter.letter_date).toISOString().split('T')[0] %>" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="received_date" class="form-label">Дата получения <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="received_date" name="received_date" value="<%= new Date(letter.received_date).toISOString().split('T')[0] %>" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="deadline" class="form-label">Срок исполнения</label>
+                                    <input type="date" class="form-control" id="deadline" name="deadline" value="<%= letter.deadline ? new Date(letter.deadline).toISOString().split('T')[0] : '' %>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="executor_id" class="form-label">Исполнитель</label>
+                                    <select class="form-select" id="executor_id" name="executor_id">
+                                        <option value="">Не назначен</option>
+                                        <% executors.forEach(function(executor) { %>
+                                            <option value="<%= executor.id %>" <%= letter.executor_id === executor.id ? 'selected' : '' %>>
+                                                <%= executor.full_name %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Параметры исполнения и контроля -->
+                    <div class="row mt-3 border-top pt-4">
+                        <div class="col-md-12">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-shield-check text-success me-2"></i>Параметры исполнения и статус</h5>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="status" class="form-label">Статус исполнения</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="Зарегистрировано" <%= letter.status === 'Зарегистрировано' ? 'selected' : '' %>>Зарегистрировано</option>
+                                <option value="В работе" <%= letter.status === 'В работе' ? 'selected' : '' %>>В работе</option>
+                                <option value="На контроле" <%= letter.status === 'На контроле' ? 'selected' : '' %>>На контроле</option>
+                                <option value="Исполнено" <%= letter.status === 'Исполнено' ? 'selected' : '' %>>Исполнено</option>
+                                <option value="Архивировано" <%= letter.status === 'Архивировано' ? 'selected' : '' %>>Архивировано</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="completion_date" class="form-label">Дата завершения исполнения</label>
+                            <input type="date" class="form-control" id="completion_date" name="completion_date" value="<%= letter.completion_date ? new Date(letter.completion_date).toISOString().split('T')[0] : '' %>">
+                        </div>
+                        
+                        <div class="col-md-12 mb-3">
+                            <label for="result" class="form-label">Результат (Отчет об исполнении)</label>
+                            <textarea class="form-control" id="result" name="result" rows="3" placeholder="Описание выполненных действий, реквизиты ответного письма..."><%= letter.result || '' %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h5 class="text-dark fw-bold mb-3 border-bottom pb-2"><i class="bi bi-paperclip text-primary me-2"></i>Файлы вложений</h5>
+                            
+                            <!-- Список текущих вложений -->
+                            <% if (attachments && attachments.length > 0) { %>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Текущие прикрепленные файлы (нажмите <i class="bi bi-x-circle text-danger"></i> для быстрого удаления):</label>
+                                    <div class="d-flex flex-wrap mt-1">
+                                        <% attachments.forEach(function(attachment) { %>
+                                            <div class="attachment-chip d-flex align-items-center me-3 mb-2 p-2 bg-light border rounded">
+                                                <i class="bi bi-file-earmark-fill text-secondary fs-5 me-1"></i>
+                                                <span class="small fw-bold text-dark me-2" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= attachment.file_name %></span>
+                                                <button class="attachment-delete-btn" data-id="<%= attachment.id %>" data-name="<%= attachment.file_name %>" type="button" title="Удалить">
+                                                    <i class="bi bi-x-circle fs-6"></i>
+                                                </button>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            <% } %>
+                            
+                            <div class="mb-3">
+                                <label for="attachments" class="form-label">Добавить новые вложенные файлы</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-cloud-arrow-up text-primary"></i></span>
+                                    <input type="file" class="form-control" id="attachments" name="attachments" multiple>
+                                </div>
+                                <div class="form-text mt-1 text-muted"><i class="bi bi-info-circle me-1"></i>Можно прикрепить до 5 файлов. Форматы: JPEG, PNG, PDF, DOC, DOCX, XLS, XLSX. Лимит размера: 10 МБ.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Краткое содержание (Аннотация)</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Суть обращения..."><%= letter.description %></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2.5 shadow-sm fw-bold"><i class="bi bi-check-circle me-1"></i> Сохранить изменения</button>
+                        <a href="/letters/<%= letter.id %>" class="btn btn-outline-secondary px-4 py-2.5">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handles conditional required styling and date filling inside edit form
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusSelect = document.getElementById('status');
+        const completionDateInput = document.getElementById('completion_date');
+        const resultTextarea = document.getElementById('result');
+
+        function checkExecutionState() {
+            if (statusSelect.value === 'Исполнено') {
+                if (!completionDateInput.value) {
+                    completionDateInput.value = new Date().toISOString().split('T')[0];
+                }
+                resultTextarea.setAttribute('required', true);
+            } else {
+                resultTextarea.removeAttribute('required');
+            }
+        }
+
+        statusSelect.addEventListener('change', checkExecutionState);
+        checkExecutionState();
+    });
+</script>

@@ -1,0 +1,14 @@
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4">Ошибка</h1>
+            <% if (message) { %>
+                <p class="lead text-danger"><%= message %></p>
+            <% } %>
+            <% if (error && error.status) { %>
+                <p class="text-muted">Статус: <%= error.status %></p>
+            <% } %>
+            <a href="/" class="btn btn-primary">Вернуться на главную</a>
+        </div>
+    </div>
+</div> 

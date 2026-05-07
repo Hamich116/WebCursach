@@ -1,0 +1,198 @@
+<div class="row mb-4 align-items-center animate-fade-in">
+    <div class="col-md-8">
+        <h1 class="h2 text-dark m-0"><i class="bi bi-file-earmark-text text-primary me-2"></i>Карточка письма №<%= letter.incoming_number %></h1>
+        <p class="text-muted m-0">Подробная информация о входящем документе и статус его исполнения</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <% if (currentUser.role_id === 1 || (currentUser.role_id === 2 && letter.registrar_id === currentUser.id)) { %>
+            <a href="/letters/<%= letter.id %>/edit" class="btn btn-primary me-2 shadow-sm"><i class="bi bi-pencil-square me-1"></i> Редактировать</a>
+        <% } %>
+        <a href="/letters" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left me-1"></i> Назад в реестр</a>
+    </div>
+</div>
+
+<div class="row g-4 animate-fade-in">
+    <!-- Левая колонка: Основные реквизиты -->
+    <div class="col-lg-6">
+        <div class="card card-premium h-100 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="m-0 text-dark fw-bold"><i class="bi bi-info-circle me-2"></i>Регистрационные реквизиты</h5>
+            </div>
+            <div class="card-body">
+                <div class="detail-item">
+                    <div class="detail-label">Входящий номер</div>
+                    <div class="detail-value fw-bold text-primary"><%= letter.incoming_number %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Дата регистрации</div>
+                    <div class="detail-value"><%= new Date(letter.registration_date).toLocaleDateString('ru-RU') %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Зарегистрировал</div>
+                    <div class="detail-value">
+                        <i class="bi bi-person text-muted me-1"></i><%= letter.registrar_name %>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Статус документа</div>
+                    <div class="detail-value mt-1">
+                        <% 
+                            let statusBadgeClass = 'badge-registered';
+                            let statusIcon = 'bi-bookmark-plus';
+                            if (letter.status === 'В работе') { statusBadgeClass = 'badge-in-progress'; statusIcon = 'bi-clock'; }
+                            else if (letter.status === 'На контроле') { statusBadgeClass = 'badge-on-control'; statusIcon = 'bi-exclamation-circle'; }
+                            else if (letter.status === 'Исполнено') { statusBadgeClass = 'badge-executed'; statusIcon = 'bi-check-lg'; }
+                            else if (letter.status === 'Архивировано') { statusBadgeClass = 'badge-archived'; statusIcon = 'bi-archive'; }
+                        %>
+                        <span class="badge badge-status <%= statusBadgeClass %>">
+                            <i class="bi <%= statusIcon %>"></i> <%= letter.status %>
+                        </span>
+                    </div>
+                </div>
+
+                <h5 class="mt-4 pt-2 text-dark fw-bold mb-3"><i class="bi bi-person-badge me-2"></i>Сведения об отправителе</h5>
+                <div class="detail-item">
+                    <div class="detail-label">Отправитель (Организация / ФИО)</div>
+                    <div class="detail-value fw-bold"><%= letter.sender_name %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Почтовый адрес отправителя</div>
+                    <div class="detail-value"><%= letter.sender_address || '<span class="text-muted small">Не указан</span>' %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Контакты (Email / Телефон)</div>
+                    <div class="detail-value"><%= letter.sender_contact || '<span class="text-muted small">Не указаны</span>' %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Правая колонка: Описание, Срок и Исполнитель -->
+    <div class="col-lg-6">
+        <div class="card card-premium h-100 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="m-0 text-dark fw-bold"><i class="bi bi-file-earmark-check me-2"></i>Параметры исполнения</h5>
+            </div>
+            <div class="card-body">
+                <div class="detail-item">
+                    <div class="detail-label">Тематика письма (Заголовок)</div>
+                    <div class="detail-value fw-bold"><%= letter.subject %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Дата отправки письма (исходящая дата)</div>
+                    <div class="detail-value"><%= new Date(letter.letter_date).toLocaleDateString('ru-RU') %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Дата фактического получения</div>
+                    <div class="detail-value"><%= new Date(letter.received_date).toLocaleDateString('ru-RU') %></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Срок исполнения (Контрольная дата)</div>
+                    <div class="detail-value">
+                        <% if (letter.deadline) { %>
+                            <% 
+                                const deadline = new Date(letter.deadline);
+                                const today = new Date();
+                                const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                                const badgeClass = diffDays < 0 ? 'bg-danger text-white' :
+                                                 diffDays <= 3 ? 'bg-warning text-dark' :
+                                                 'bg-info text-dark';
+                            %>
+                            <span class="badge <%= badgeClass %> px-2.5 py-1.5" style="font-size: 0.82rem;">
+                                <i class="bi bi-calendar-event me-1"></i> <%= deadline.toLocaleDateString('ru-RU') %>
+                                <% if (diffDays < 0) { %>(Просрочено на <%= Math.abs(diffDays) %> дн.)<% } %>
+                            </span>
+                        <% } else { %>
+                            <span class="text-muted">Срок не установлен</span>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Назначенный исполнитель</div>
+                    <div class="detail-value fw-bold">
+                        <% if (letter.executor_name) { %>
+                            <i class="bi bi-person-check text-success me-1"></i> <%= letter.executor_name %>
+                        <% } else { %>
+                            <span class="text-warning"><i class="bi bi-person-exclamation me-1"></i>Исполнитель не назначен</span>
+                        <% } %>
+                    </div>
+                </div>
+
+                <% if (letter.description) { %>
+                    <div class="detail-item">
+                        <div class="detail-label">Краткое содержание (Аннотация)</div>
+                        <div class="detail-value mt-1 text-muted" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.5;"><%= letter.description %></div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Отчет об исполнении -->
+<% if (letter.status === 'Исполнено' || letter.result) { %>
+    <div class="row mt-4 animate-fade-in">
+        <div class="col-12">
+            <div class="card card-premium shadow-sm border-success" style="border-left: 4px solid var(--success-color);">
+                <div class="card-header bg-white py-3">
+                    <h5 class="m-0 text-success fw-bold"><i class="bi bi-clipboard-check me-2"></i>Результат исполнения</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="detail-label">Дата отметки об исполнении</div>
+                            <div class="detail-value fw-bold">
+                                <%= letter.completion_date ? new Date(letter.completion_date).toLocaleDateString('ru-RU') : '-' %>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="detail-label">Содержание отчета</div>
+                            <div class="detail-value mt-1" style="white-space: pre-wrap; line-height: 1.5;"><%= letter.result || 'Результат зафиксирован без текстового отчета.' %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- Вложения -->
+<div class="row mt-4 animate-fade-in">
+    <div class="col-12">
+        <div class="card card-premium shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="m-0 text-dark fw-bold"><i class="bi bi-paperclip me-2"></i>Вложенные файлы</h5>
+            </div>
+            <div class="card-body">
+                <% if (attachments && attachments.length > 0) { %>
+                    <div class="d-flex flex-wrap">
+                        <% attachments.forEach(function(attachment) { %>
+                            <div class="attachment-chip d-flex align-items-center me-3 mb-3 p-2 bg-light border rounded shadow-sm">
+                                <i class="bi bi-file-earmark-fill text-secondary fs-4 me-2"></i>
+                                <div class="me-3">
+                                    <div class="fw-bold small text-dark" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= attachment.file_name %></div>
+                                    <div class="text-muted" style="font-size: 0.75rem;"><%= Math.round(attachment.file_size / 1024) %> KB</div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <a href="/letters/attachments/<%= attachment.id %>/download" class="btn btn-sm btn-link text-primary p-0 me-2" title="Скачать">
+                                        <i class="bi bi-download fs-5"></i>
+                                    </a>
+                                    <% if (currentUser.role_id === 1 || (currentUser.role_id === 2 && letter.registrar_id === currentUser.id)) { %>
+                                        <button class="attachment-delete-btn" data-id="<%= attachment.id %>" data-name="<%= attachment.file_name %>" title="Удалить файл">
+                                            <i class="bi bi-x-circle fs-5"></i>
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-3 text-muted">
+                        <i class="bi bi-paperclip fs-3 d-block mb-1"></i>
+                        К данному письму файлы не прикреплены
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

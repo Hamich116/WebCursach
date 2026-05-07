@@ -1,0 +1,32 @@
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-5">
+        <div class="card card-premium shadow-lg animate-fade-in">
+            <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
+                <div class="brand-logo-small mb-3 mx-auto" style="width: 60px; height: 60px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+                    <i class="bi bi-envelope-paper-fill text-white fs-3"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">Авторизация</h3>
+                <p class="text-muted small">Введите свои учетные данные для доступа к системе</p>
+            </div>
+            <div class="card-body px-4 py-4 pt-2">
+                <form action="/auth/login" method="POST" class="form-premium">
+                    <div class="mb-3">
+                        <label for="username" class="form-label"><i class="bi bi-person text-muted me-1"></i> Имя пользователя</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Введите логин" required autofocus>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label"><i class="bi bi-key text-muted me-1"></i> Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 shadow-sm fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Войти в систему
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3 small text-muted">
+            <i class="bi bi-info-circle me-1"></i> По умолчанию доступен логин: <code class="bg-light px-1 rounded">admin</code> / пароль: <code class="bg-light px-1 rounded">admin123</code>
+        </div>
+    </div>
+</div>
