@@ -1,0 +1,55 @@
+/* Simple and Clean Student Styles for WebCursach */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.navbar {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.card {
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+}
+
+/* Custom Spacing */
+.mt-5 {
+    margin-top: 3rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Attachment Styles */
+.attachment-item {
+    padding: 8px 12px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+/* Status Badges */
+.badge {
+    font-size: 0.85em;
+    padding: 0.35em 0.65em;
+}
+
+.bg-registered { background-color: #6c757d; color: #fff; }
+.bg-in-progress { background-color: #0d6efd; color: #fff; }
+.bg-on-control { background-color: #ffc107; color: #000; }
+.bg-executed { background-color: #198754; color: #fff; }
+.bg-archived { background-color: #212529; color: #fff; }
